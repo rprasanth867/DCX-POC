@@ -18,11 +18,14 @@
         
         window?.xq?.getSdkUserDetails(t);
       }
-      
-      const token = 
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzQ1OTUzMTcsImZpcnN0X25hbWUiOiJKYWNrIiwiaWF0IjoxNzM0NTkxNzE3LCJqdGkiOiIyOWMzZmQ4ZC1iOTdlLTQ0YjQtOTUzNS1jNzZmYjdiYTMzODUiLCJsYXN0X25hbWUiOm51bGwsInNka19rZXkiOiJoSURQRE5WajdKRWpSaE1DM0d4WWlFaXdwRWVrQm1LaiIsInVzZXJuYW1lIjoiamFja0BjdXN0b21lci5jb20ifQ.RGXJD02XonxlZdFTHRUDz54w08G-tn1L6AuzxM2o_So"
+    </script>
 
-      initiateHandshake(token);
+    <!-- When page loads if token is present in localStorage, invoking handshake with this token -->
+    <script>
+      const token = localStorage.getItem("X-DVC-Token");
+      if (token) {
+        initiateHandshake(token);
+      }
     </script>
 
 
