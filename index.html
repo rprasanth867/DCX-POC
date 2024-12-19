@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Need to fetch these bundle files to use DCX components. It has core logic to invoke the components -->
+    <script src="https://nouvealoads.preprod.nouveau-labs.in/console/external_api.js"></script>
+    <script src="./bundle.min.js"></script>
+
+
+    <!-- This script contains the logic to handshake for the DCX app -->
+    <script>
+      function initiateHandshake(t) {
+        const xq = new window.XQ(
+          "https://newtesting.dev-vc24.nouveau-labs.in",
+          "https://dev.sample-server.nouveau-labs.in"
+        );
+
+        window.xq = xq;
+        
+        window?.xq?.getSdkUserDetails(t);
+      }
+      
+      const token = 
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzQ1OTUzMTcsImZpcnN0X25hbWUiOiJKYWNrIiwiaWF0IjoxNzM0NTkxNzE3LCJqdGkiOiIyOWMzZmQ4ZC1iOTdlLTQ0YjQtOTUzNS1jNzZmYjdiYTMzODUiLCJsYXN0X25hbWUiOm51bGwsInNka19rZXkiOiJoSURQRE5WajdKRWpSaE1DM0d4WWlFaXdwRWVrQm1LaiIsInVzZXJuYW1lIjoiamFja0BjdXN0b21lci5jb20ifQ.RGXJD02XonxlZdFTHRUDz54w08G-tn1L6AuzxM2o_So"
+
+      initiateHandshake(token);
+    </script>
+
+
+    <!-- This script contains the logic for invoking caller component with attributes -->
+    <script>
+      window.onCallEnded = function() {
+        const callerComponent = document.getElementsByTagName("caller-component")[0];
+        callerComponent?.remove();
+      }
+
+      function handleCall(e) {
+        e.preventDefault();
+
+        // Accessing phone number from input box
+        const number = document.getElementsByName("number")[0].value;
+
+        // Creating caller component using DOM APIs
+        const callerComponent = document.createElement("caller-component");
+        // Attaching attributes
+        callerComponent["current-user-id"] = "9bfafc56-dc5b-4fd6-82e3-c27e719ebcc0";
+        callerComponent["call-type"] = "AUDIO";
+        callerComponent["call-invite-data"] = JSON.stringify({dvc: [], telephony: [number]});
+        callerComponent["draggable"] = "true";
+        callerComponent["on-call-ended"] = "onCallEnded";
+        callerComponent["on-error"] = "onCallEnded";
+
+        // Appending caller compoennt to body using DOM API
+        document.getElementsByTagName("body")[0].appendChild(callerComponent);
+      }
+    </script>
+
+
+    <!-- This script contains the code to add/update token from the UI -->
+    <script>
+      function handleAddToken(e) {
+        e.preventDefault();
+
+        // Accessing token from input box
+        const token = document.getElementsByName("token")[0].value;
+
+        initiateHandshake(token);
+      }
+    </script>
+
+
+    <!-- This style contains CSS for this sample app -->
+    <style>
+      #app-root, #app-root .panel { display: flex; justify-content: center; align-items: center; height: unset; flex-direction: column;}
+      #app-root #main-container { max-width: 1400px; width: 80%; padding-inline: 60px; }
+      #app-root h4 { font-size: 25px; color: orange }
+      #app-root .highlight-blue { color: dodgerblue; }
+
+      #app-root .panel { margin-top: 70px; }
+      #app-root form { background-color: #dbeaf7; padding: 40px; border-radius: 20px; display: flex; flex-direction: column; margin-bottom: 30px;}
+      #app-root .field-container { margin-bottom: 20px; }
+      #app-root .field-container label { font-weight: 500; font-size: 20px; margin-right: 30px;}
+      #app-root .field-container input { padding: 10px; border-radius: 10px; border: unset; }
+      #app-root button { color: white; background-color: dodgerblue; border-radius: 10px; padding: 10px 30px; cursor: pointer; border: unset; align-self: center;}
+    </style>
+
+  </head>
+
+  <!-- This body contains the HTML code to display UI in the browser -->
+  <body>
+    <div id="app-root">
+      <div id="main-container">
+        <header>
+          <h4>Dolphin<span class="highlight-blue">CX</span> Integration</h4>
+          <p>This is the sample POC to integrate DCX components to static html using basic Javascript</p>
+        </header>
+        <div class="panel">
+          <form onsubmit="handleCall(event)">
+            <div class="field-container">
+              <label for="number">Number:</label>
+              <input id="number" type="text" name="number" />
+            </div>
+            <button type="submit">Call</button>
+          </form>
+          <form onsubmit="handleAddToken(event)">
+            <div class="field-container">
+              <label for="token">Token:</label>
+              <input id="token" type="text" name="token" />
+            </div>
+            <button type="submit">Add Token</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
+
+<!-- // <caller-component
+//   current-user-id="9bfafc56-dc5b-4fd6-82e3-c27e719ebcc0"
+//   call-type="AUDIO"
+//   call-invite-data="{dvc:[],telephony:['9985702662']}"
+// ></caller-component> -->
+
+
+<!-- way 2
+callerComponent.onCallEnded = onCallEnded;
+callerComponent.onError = onCallEnded;
+
+way 3
+callerComponent.addEventListener("call-ended", window.onCallEnded);
+callerComponent.addEventListener("error", window.onCallEnded); -->
