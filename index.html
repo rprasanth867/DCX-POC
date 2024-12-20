@@ -6,6 +6,7 @@
     <script src="./bundle.min.js"></script>
 
 
+
     <!-- This script contains the logic to handshake for the DCX app -->
     <script>
       function initiateHandshake(t) {
@@ -16,17 +17,46 @@
 
         window.xq = xq;
         
-        window?.xq?.getSdkUserDetails(t);
+        window?.xq?.getSdkUserDetails(t, undefined, onSuccess, onFailure);
       }
     </script>
 
-    <!-- When page loads if token is present in localStorage, invoking handshake with this token -->
+
+
+    <!-- This script contains sample app logic to handle DCX handshake response -->
     <script>
-      const token = localStorage.getItem("X-DVC-Token");
-      if (token) {
-        initiateHandshake(token);
+      function onSuccess() {
+        const errorEle = document.getElementById("token-error");
+        if (errorEle) errorEle?.remove();
+      }
+
+      function onFailure() {
+        let errorEle = document.getElementById("token-error");
+        if (errorEle) return; 
+
+        errorEle = document.createElement("p");
+        errorEle.innerHTML = "Something went wrong. <br /> Please update the token and try again!";
+        errorEle.id = "token-error";
+
+        const tokenField = document.getElementById("token-field");
+        tokenField.appendChild(errorEle);
       }
     </script>
+
+
+
+    <!-- When page loads if token is present in localStorage, invoking handshake with this token -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const token = localStorage.getItem("X-DVC-Token");
+        if (token) {
+          initiateHandshake(token);
+          const tokenInput = document.getElementById('token');
+          tokenInput.defaultValue = token;
+        }
+        })
+    </script>
+
 
 
     <!-- This script contains the logic for invoking caller component with attributes -->
@@ -58,6 +88,7 @@
     </script>
 
 
+
     <!-- This script contains the code to add/update token from the UI -->
     <script>
       function handleAddToken(e) {
@@ -69,6 +100,7 @@
         initiateHandshake(token);
       }
     </script>
+
 
 
     <!-- This style contains CSS for this sample app -->
@@ -84,9 +116,11 @@
       #app-root .field-container label { font-weight: 500; font-size: 20px; margin-right: 30px;}
       #app-root .field-container input { padding: 10px; border-radius: 10px; border: unset; }
       #app-root button { color: white; background-color: dodgerblue; border-radius: 10px; padding: 10px 30px; cursor: pointer; border: unset; align-self: center;}
+      #app-root #token-error { color: red }
     </style>
 
   </head>
+
 
   <!-- This body contains the HTML code to display UI in the browser -->
   <body>
@@ -105,7 +139,7 @@
             <button type="submit">Call</button>
           </form>
           <form onsubmit="handleAddToken(event)">
-            <div class="field-container">
+            <div id="token-field" class="field-container">
               <label for="token">Token:</label>
               <input id="token" type="text" name="token" />
             </div>
