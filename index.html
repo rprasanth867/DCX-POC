@@ -3,7 +3,7 @@
   <head>
     <!-- Need to fetch these bundle files to use DCX components. It has core logic to invoke the components -->
     <script src="https://nouvealoads.preprod.nouveau-labs.in/console/external_api.js"></script>
-    <script src="./bundle.min.js"></script>
+    <script src="http://localhost:3000/static/js/bundle.js"></script>
 
 
 
@@ -87,6 +87,32 @@
       }
     </script>
 
+    <!-- Temp script to test window wrapper approach -->
+    <script>
+      function onError(e) {
+        console.log('++++++++++++++++++error occured', e);
+      }
+
+      function handleCall2(e) {
+        e.preventDefault();
+
+        // Accessing phone number from input box
+        const number = document.getElementsByName("number")[0].value;
+
+        window.dvcSdkComponents.initializeComponent("caller", {
+          "current-user-id": "9bfafc56-dc5b-4fd6-82e3-c27e719ebcc0",
+          "call-type": "AUDIO",
+          "call-invite-data": {dvc: [], telephony: [number]},
+          "draggable": true,
+          "on-error": onError,
+          "on-call-ended": onError
+        })
+      }
+
+      function handleClickUpdate() {
+        window.dvcSdkComponents.updateComponent("caller", { "call-type": "AUDIO" })
+      }
+    </script>
 
 
     <!-- This script contains the code to add/update token from the UI -->
@@ -111,7 +137,7 @@
       #app-root .highlight-blue { color: dodgerblue; }
 
       #app-root .panel { margin-top: 70px; }
-      #app-root form { background-color: #dbeaf7; padding: 40px; border-radius: 20px; display: flex; flex-direction: column; margin-bottom: 30px;}
+      #app-root form { background-color: #f5f5f5; padding: 40px; border-radius: 20px; display: flex; flex-direction: column; margin-bottom: 30px;}
       #app-root .field-container { margin-bottom: 20px; }
       #app-root .field-container label { font-weight: 500; font-size: 20px; margin-right: 30px;}
       #app-root .field-container input { padding: 10px; border-radius: 10px; border: unset; }
@@ -131,7 +157,7 @@
           <p>This is the sample POC to integrate DCX components to static html using basic Javascript</p>
         </header>
         <div class="panel">
-          <form onsubmit="handleCall(event)">
+          <form onsubmit="handleCall2(event)">
             <div class="field-container">
               <label for="number">Number:</label>
               <input id="number" type="text" name="number" />
@@ -145,6 +171,7 @@
             </div>
             <button type="submit">Add Token</button>
           </form>
+          <button onclick="handleClickUpdate()">Update</button>
         </div>
       </div>
     </div>
