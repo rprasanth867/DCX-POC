@@ -3,7 +3,7 @@
   <head>
     <!-- Need to fetch these bundle files to use DCX components. It has core logic to invoke the components -->
     <script src="https://nouvealoads.preprod.nouveau-labs.in/console/external_api.js"></script>
-    <script src="./bundle.min.js"></script>
+    <script src="https://ephemeral-phoenix-0d916f.netlify.app/bundle.min.js"></script>
 
 
 
@@ -139,7 +139,6 @@
       }
     </script>
 
-
   </head>
 
 
@@ -174,5 +173,18 @@
         </div>
       </div>
     </div>
+    <pre style="display: none;">
+      Get Token using curl command:
+      curl -s -X POST -H 'Content-Type: application/json' -d '{"first_name": "Mickey", "last_name": null, "username": "mickey@customer.com", "tenant_domain": "pulsedolphincx.preprod.nouveau-labs.in"}' https://dev.sample-server.nouveau-labs.in/api/v1/sdk/token | grep -oP '(?<="token": ")[^"]+'
+
+      Get token using Javascript fetch:
+      fetch("https://dev.sample-server.nouveau-labs.in/api/v1/sdk/token", {
+        method: "POST",
+        body: '{"first_name": "Mickey", "last_name": null, "username": "mickey@customer.com", "tenant_domain": "pulsedolphincx.preprod.nouveau-labs.in"}',
+        headers: {
+            "content-type": "application/json"
+        }
+      })
+    </pre>
   </body>
 </html>
