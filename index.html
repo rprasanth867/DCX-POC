@@ -9,18 +9,65 @@
 
     <!-- This script contains the logic to handshake for the DCX app -->
     <script>
-      function initiateHandshake(t) {
-        const xq = new window.XQ(
-          "https://newtesting.dev-vc24.nouveau-labs.in",
-          "https://dev.sample-server.nouveau-labs.in"
-        );
+      function initiateHandshake(server, token) {
+        const xq = new window.XQ(server);
 
         window.xq = xq;
         
-        window?.xq?.getSdkUserDetails(t, undefined, onSuccess, onFailure);
+        window?.xq?.getSdkUserDetails(token, undefined, onSuccess, onFailure);
       }
     </script>
 
+
+
+
+    <!-- This script contains the logic for invoking/removing caller component with attributes -->
+    <script>
+      window.onCallEnded = function() {
+        const callerComponent = document.getElementsByTagName("caller-component")[0];
+        callerComponent?.remove();
+      }
+
+      function handleCall(e) {
+        e.preventDefault();
+
+        // Accessing phone number from input box
+        const number = document.getElementsByName("number")[0].value;
+
+        // Creating caller component using DOM APIs
+        const callerComponent = document.createElement("caller-component");
+        // Attaching attributes
+        callerComponent.setAttribute("style", "display: contents;");
+        callerComponent.setAttribute("current-user-id", JSON.parse(localStorage.getItem("X-DVC-Details") || "{}").uuid);
+        callerComponent.setAttribute("call-type", "AUDIO");
+        callerComponent.setAttribute("call-invite-data", JSON.stringify({dvc: [], telephony: [number]}));
+        callerComponent.setAttribute("draggable", "true");
+        callerComponent.setAttribute("on-call-ended", "onCallEnded");
+        callerComponent.setAttribute("on-error", "onCallEnded");
+
+        // Appending caller compoennt to body using DOM API
+        document.getElementsByTagName("body")[0].appendChild(callerComponent);
+      }
+    </script>
+
+
+
+    <!-- This style contains CSS for this sample app -->
+    <style>
+      #app-root, #app-root .panel { display: flex; justify-content: center; align-items: center; height: unset; flex-direction: column;}
+      #app-root #main-container { max-width: 1400px; width: 80%; padding-inline: 60px; }
+      #app-root h4 { font-size: 25px; color: orange }
+      #app-root .highlight-blue { color: dodgerblue; }
+
+      #app-root .panel { margin-top: 70px; }
+      #app-root .panel-heading { margin: 0px 0px 10px 0px; text-align: center; font-size: 20px; }
+      #app-root form { background-color: #f5f5f5; padding: 40px; border-radius: 20px; display: flex; flex-direction: column; margin-bottom: 30px;}
+      #app-root .field-container { margin-bottom: 20px; }
+      #app-root .field-container label { font-weight: 500; font-size: 16px; margin-right: 30px; display: inline-block; width: 100px;}
+      #app-root .field-container input { width: 350px; padding: 10px; border-radius: 10px; border: unset; }
+      #app-root button { color: white; background-color: dodgerblue; border-radius: 10px; padding: 10px 30px; cursor: pointer; border: unset; align-self: center;}
+      #app-root #token-error { color: red }
+    </style>
 
 
     <!-- This script contains sample app logic to handle DCX handshake response -->
@@ -45,79 +92,53 @@
 
 
 
-    <!-- When page loads if token is present in localStorage, invoking handshake with this token -->
+    <!-- When page loads if token & server are present in localStorage, invoking handshake with this token -->
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         const token = localStorage.getItem("X-DVC-Token");
+        const server = localStorage.getItem("X-DVC-Server");
+
         if (token) {
-          initiateHandshake(token);
           const tokenInput = document.getElementById('token');
           tokenInput.defaultValue = token;
         }
-        })
+
+        if (server) {
+          const serverInput = document.getElementById("server");
+          serverInput.defaultValue = server;
+        }
+
+        if (token && server) {
+          initiateHandshake(server, token);
+        }
+      })
     </script>
 
 
 
-    <!-- This script contains the logic for invoking caller component with attributes -->
+    <!-- This script contains the code to update configs from the UI -->
     <script>
-      window.onCallEnded = function() {
-        const callerComponent = document.getElementsByTagName("caller-component")[0];
-        callerComponent?.remove();
-      }
-
-      function handleCall(e) {
-        e.preventDefault();
-
-        // Accessing phone number from input box
-        const number = document.getElementsByName("number")[0].value;
-
-        // Creating caller component using DOM APIs
-        const callerComponent = document.createElement("caller-component");
-        // Attaching attributes
-        callerComponent["current-user-id"] = "9bfafc56-dc5b-4fd6-82e3-c27e719ebcc0";
-        callerComponent["call-type"] = "AUDIO";
-        callerComponent["call-invite-data"] = JSON.stringify({dvc: [], telephony: [number]});
-        callerComponent["draggable"] = "true";
-        callerComponent["on-call-ended"] = "onCallEnded";
-        callerComponent["on-error"] = "onCallEnded";
-
-        // Appending caller compoennt to body using DOM API
-        document.getElementsByTagName("body")[0].appendChild(callerComponent);
-      }
-    </script>
-
-
-
-    <!-- This script contains the code to add/update token from the UI -->
-    <script>
-      function handleAddToken(e) {
+      function handleUpdateConfigs(e) {
         e.preventDefault();
 
         // Accessing token from input box
         const token = document.getElementsByName("token")[0].value;
 
-        initiateHandshake(token);
+        // Accesssing DCX server from input box
+        const server = document.getElementsByName("server")[0].value;
+
+        if (!token || !server) {
+          alert("DCX-Server & Token are required!");
+          return;
+        }
+
+        // Storing server in the localStorage
+        localStorage.setItem("X-DVC-Server", server);
+
+        initiateHandshake(server, token);
       }
     </script>
 
-
-
-    <!-- This style contains CSS for this sample app -->
-    <style>
-      #app-root, #app-root .panel { display: flex; justify-content: center; align-items: center; height: unset; flex-direction: column;}
-      #app-root #main-container { max-width: 1400px; width: 80%; padding-inline: 60px; }
-      #app-root h4 { font-size: 25px; color: orange }
-      #app-root .highlight-blue { color: dodgerblue; }
-
-      #app-root .panel { margin-top: 70px; }
-      #app-root form { background-color: #dbeaf7; padding: 40px; border-radius: 20px; display: flex; flex-direction: column; margin-bottom: 30px;}
-      #app-root .field-container { margin-bottom: 20px; }
-      #app-root .field-container label { font-weight: 500; font-size: 20px; margin-right: 30px;}
-      #app-root .field-container input { padding: 10px; border-radius: 10px; border: unset; }
-      #app-root button { color: white; background-color: dodgerblue; border-radius: 10px; padding: 10px 30px; cursor: pointer; border: unset; align-self: center;}
-      #app-root #token-error { color: red }
-    </style>
 
   </head>
 
@@ -131,6 +152,18 @@
           <p>This is the sample POC to integrate DCX components to static html using basic Javascript</p>
         </header>
         <div class="panel">
+          <form onsubmit="handleUpdateConfigs(event)">
+            <h5 class="panel-heading">Configs</h5>
+            <div id="server-field" class="field-container">
+              <label for="server">DCX Server:</label>
+              <input id="server" type="text" name="server" />
+            </div>
+            <div id="token-field" class="field-container">
+              <label for="token">Token:</label>
+              <input id="token" type="text" name="token" />
+            </div>
+            <button type="submit">Update</button>
+          </form>
           <form onsubmit="handleCall(event)">
             <div class="field-container">
               <label for="number">Number:</label>
@@ -138,31 +171,8 @@
             </div>
             <button type="submit">Call</button>
           </form>
-          <form onsubmit="handleAddToken(event)">
-            <div id="token-field" class="field-container">
-              <label for="token">Token:</label>
-              <input id="token" type="text" name="token" />
-            </div>
-            <button type="submit">Add Token</button>
-          </form>
         </div>
       </div>
     </div>
   </body>
 </html>
-
-
-<!-- // <caller-component
-//   current-user-id="9bfafc56-dc5b-4fd6-82e3-c27e719ebcc0"
-//   call-type="AUDIO"
-//   call-invite-data="{dvc:[],telephony:['9985702662']}"
-// ></caller-component> -->
-
-
-<!-- way 2
-callerComponent.onCallEnded = onCallEnded;
-callerComponent.onError = onCallEnded;
-
-way 3
-callerComponent.addEventListener("call-ended", window.onCallEnded);
-callerComponent.addEventListener("error", window.onCallEnded); -->
