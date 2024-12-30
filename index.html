@@ -2,7 +2,7 @@
 <html>
   <head>
     <!-- Need to fetch these bundle files to use DCX components. It has core logic to invoke the components -->
-    <script src="https://nouvealoads.preprod.nouveau-labs.in/console/external_api.js"></script>
+    <script src="https://pulsedolphincx.nexus.dolphincx.com/console/external_api.js"></script>
     <script src="https://ephemeral-phoenix-0d916f.netlify.app/bundle.min.js"></script>
 
 
@@ -43,7 +43,6 @@
         callerComponent.setAttribute("call-invite-data", JSON.stringify({dvc: [], telephony: [number]}));
         callerComponent.setAttribute("draggable", "true");
         callerComponent.setAttribute("on-call-ended", "onCallEnded");
-        callerComponent.setAttribute("on-error", "onCallEnded");
 
         // Appending caller compoennt to body using DOM API
         document.getElementsByTagName("body")[0].appendChild(callerComponent);
@@ -61,11 +60,11 @@
 
       #app-root .panel { margin-top: 70px; }
       #app-root .panel-heading { margin: 0px 0px 10px 0px; text-align: center; font-size: 20px; }
-      #app-root form { background-color: #f5f5f5; padding: 40px; border-radius: 20px; display: flex; flex-direction: column; margin-bottom: 30px;}
+      #app-root form { background-color: #efefef; padding: 40px; border-radius: 10px; display: flex; flex-direction: column; margin-bottom: 30px;}
       #app-root .field-container { margin-bottom: 20px; }
       #app-root .field-container label { font-weight: 500; font-size: 16px; margin-right: 30px; display: inline-block; width: 100px;}
-      #app-root .field-container input { width: 350px; padding: 10px; border-radius: 10px; border: unset; }
-      #app-root button { color: white; background-color: dodgerblue; border-radius: 10px; padding: 10px 30px; cursor: pointer; border: unset; align-self: center;}
+      #app-root .field-container input { width: 350px; padding: 10px; border-radius: 5px; border: unset; }
+      #app-root button { color: white; background-color: dodgerblue; border-radius: 5px; padding: 10px 30px; cursor: pointer; border: unset; align-self: center;}
       #app-root #token-error { color: red }
     </style>
 
@@ -134,6 +133,7 @@
 
         // Storing server in the localStorage
         localStorage.setItem("X-DVC-Server", server);
+        localStorage.setItem("X-DVC-Token", token);
 
         initiateHandshake(server, token);
       }
@@ -184,7 +184,7 @@
         headers: {
             "content-type": "application/json"
         }
-      })
+      }).then(res => res.json()).then(res => console.log(res?.token))
     </pre>
   </body>
 </html>
