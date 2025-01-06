@@ -3,8 +3,7 @@
   <head>
     <!-- Need to fetch these bundle files to use DCX components. It has core logic to invoke the components -->
     <script src="https://pulsedolphincx.nexus.dolphincx.com/console/external_api.js"></script>
-    <!-- <script src="https://ephemeral-phoenix-0d916f.netlify.app/bundle.min.js"></script> -->
-     <script src="http://localhost:3000/static/js/bundle.js"></script>
+    <script src="https://ephemeral-phoenix-0d916f.netlify.app/bundle.min.js"></script>
 
 
 
@@ -88,13 +87,15 @@
       #app-root h4 { font-size: 25px; color: orange }
       #app-root .highlight-blue { color: dodgerblue; }
 
-      #app-root .panel { margin-top: 70px; }
+      #app-root .panel { margin-top: 40px; }
       #app-root .panel-heading { margin: 0px 0px 10px 0px; text-align: center; font-size: 20px; }
       #app-root form { background-color: #efefef; padding: 40px; border-radius: 10px; display: flex; flex-direction: column; margin-bottom: 30px;}
-      #app-root .field-container { margin-bottom: 20px; }
+      #app-root .field-container { margin-bottom: 10px; position: relative; }
       #app-root .field-container label { font-weight: 500; font-size: 16px; margin-right: 30px; display: inline-block; width: 100px;}
       #app-root .field-container input { width: 350px; padding: 10px; border-radius: 5px; border: unset; }
-      #app-root button { color: white; background-color: dodgerblue; border-radius: 5px; padding: 10px 30px; cursor: pointer; border: unset; align-self: center;}
+      #app-root .field-container .refresh-btn { position: absolute; width: 18px; height: 18px; background-color: white; padding: 5px; border-radius: 50%; right: 30px; top: 2px; }
+      #app-root .field-container .copy-btn { position: absolute; width: 18px; height: 18px; background-color: white; padding: 5px; border-radius: 50%; right: 0px; top: 2px; }
+      #app-root button { color: white; background-color: dodgerblue; border-radius: 5px; padding: 10px 30px; cursor: pointer; border: unset; align-self: center; }
       #app-root #token-error { color: red }
     </style>
 
@@ -126,16 +127,27 @@
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         const token = localStorage.getItem("X-DVC-Token");
-        const server = localStorage.getItem("X-DVC-Server");
+        const server = localStorage.getItem("dcx-server");
+        const name = localStorage.getItem("name");
+        const email = localStorage.getItem("email");
 
-        if (token) {
-          const tokenInput = document.getElementById('token');
-          tokenInput.defaultValue = token;
-        }
+        const tokenInput = document.getElementById('token');
+
+        token ? tokenInput.defaultValue = token : tokenInput.defaultValue = "-";
 
         if (server) {
           const serverInput = document.getElementById("server");
           serverInput.defaultValue = server;
+        }
+
+        if (name) {
+          const nameInput = document.getElementById('name');
+          nameInput.defaultValue = name;
+        }
+
+        if (email) {
+          const emailInput = document.getElementById('email');
+          emailInput.defaultValue = email;
         }
 
         if (token && server) {
@@ -163,10 +175,49 @@
         }
 
         // Storing server in the localStorage
-        localStorage.setItem("X-DVC-Server", server);
+        localStorage.setItem("dcx-server", server);
         localStorage.setItem("X-DVC-Token", token);
 
         initiateHandshake(server, token);
+      }
+
+      function handleClickRefreshToken(e) {
+        const tokenInput = document.getElementById('token'); 
+        tokenInput.defaultValue = "-";
+        localStorage.removeItem("X-DVC-Token");
+
+        // Accessing name from input box
+        const name = document.getElementsByName("name")[0].value;
+
+        // Accessing email from input box
+        const email = document.getElementsByName("email")[0].value;
+
+        // Accesssing DCX server from input box
+        const server = document.getElementsByName("server")[0].value;
+
+        if (!name || !email || !server) {
+          alert("Server & Name & Email are required!");
+          return;
+        }
+
+        localStorage.setItem("name", name);
+        localStorage.setItem("email", email);
+
+        const payload = {
+          first_name: name,
+          last_name: null,
+          username: email,
+          tenant_domain: server.replace(/(http)(s)?\:\/\//, "")
+        }
+
+        fetch("https://dev.sample-server.nouveau-labs.in/api/v1/sdk/token", {
+          method: "POST",
+          body: JSON.stringify(payload),
+          headers: {
+              "content-type": "application/json"
+          }
+        })
+        .then(res => res.json()).then(res => tokenInput.defaultValue = res.token);
       }
     </script>
 
@@ -189,9 +240,19 @@
               <label for="server">DCX Server:</label>
               <input id="server" type="text" name="server" />
             </div>
+            <div id="name-field" class="field-container">
+              <label for="name">Name:</label>
+              <input id="name" type="text" name="name" />
+            </div>
+            <div id="email-field" class="field-container">
+              <label for="email">Email:</label>
+              <input id="email" type="text" name="email" />
+            </div>
             <div id="token-field" class="field-container">
               <label for="token">Token:</label>
-              <input id="token" type="text" name="token" />
+              <input disabled id="token" type="text" name="token" />
+              <svg onclick="handleClickRefreshToken(event)" class="refresh-btn" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="200px" width="200px" xmlns="http://www.w3.org/2000/svg"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path></svg>
+              <svg class="copy-btn" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M18 2H9c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h9c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H9V4h9v12zM3 15v-2h2v2H3zm0-5.5h2v2H3v-2zM10 20h2v2h-2v-2zm-7-1.5v-2h2v2H3zM5 22c-1.1 0-2-.9-2-2h2v2zm3.5 0h-2v-2h2v2zm5 0v-2h2c0 1.1-.9 2-2 2zM5 6v2H3c0-1.1.9-2 2-2z"></path></svg>
             </div>
             <button type="submit">Update</button>
           </form>
