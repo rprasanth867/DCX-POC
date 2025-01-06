@@ -3,7 +3,8 @@
   <head>
     <!-- Need to fetch these bundle files to use DCX components. It has core logic to invoke the components -->
     <script src="https://pulsedolphincx.nexus.dolphincx.com/console/external_api.js"></script>
-    <script src="https://ephemeral-phoenix-0d916f.netlify.app/bundle.min.js"></script>
+    <!-- <script src="https://ephemeral-phoenix-0d916f.netlify.app/bundle.min.js"></script> -->
+     <script src="http://localhost:3000/static/js/bundle.js"></script>
 
 
 
@@ -19,6 +20,36 @@
     </script>
 
 
+    <!-- This script contains the logic to initiate xmpp connection -->
+    <!-- It contains the logic of handling the events from xmpp connection -->
+    <script>
+      function initiateSocketConnection() {
+        const channel = new BroadcastChannel("incoming-call-channel");
+
+        window.mq?.connect();
+        window.mq?.on("newIncomingCallXmpp", (event) => channel.postMessage(event));
+      }
+
+      window.onAccepted = (d) => {
+        invokeCallerComponent({"web-client-uri": d?.web_client_uri});
+      };
+    </script>
+
+
+
+
+    <!-- This script contains the logic for Call button click -->
+    <script>
+      function handleCall(e) {
+        e.preventDefault();
+
+        // Accessing phone number from input box
+        const number = document.getElementsByName("number")[0].value;
+        invokeCallerComponent({ "call-invite-data": JSON.stringify({dvc: [], telephony: [number]}) });
+      }
+    </script>
+
+
 
 
     <!-- This script contains the logic for invoking/removing caller component with attributes -->
@@ -28,21 +59,20 @@
         callerComponent?.remove();
       }
 
-      function handleCall(e) {
-        e.preventDefault();
-
-        // Accessing phone number from input box
-        const number = document.getElementsByName("number")[0].value;
-
+      function invokeCallerComponent(attributes) {
         // Creating caller component using DOM APIs
         const callerComponent = document.createElement("caller-component");
-        // Attaching attributes
+        // Attaching common attributes
         callerComponent.setAttribute("style", "display: contents;");
         callerComponent.setAttribute("current-user-id", JSON.parse(localStorage.getItem("X-DVC-Details") || "{}").uuid);
         callerComponent.setAttribute("call-type", "AUDIO");
-        callerComponent.setAttribute("call-invite-data", JSON.stringify({dvc: [], telephony: [number]}));
         callerComponent.setAttribute("draggable", "true");
         callerComponent.setAttribute("on-call-ended", "onCallEnded");
+
+        // Attaching extra attributes 
+        for (const [key, value] of Object.entries(attributes)) {
+          callerComponent.setAttribute(key, value);
+        }
 
         // Appending caller compoennt to body using DOM API
         document.getElementsByTagName("body")[0].appendChild(callerComponent);
@@ -72,6 +102,7 @@
     <!-- This script contains sample app logic to handle DCX handshake response -->
     <script>
       function onSuccess() {
+        initiateSocketConnection();
         const errorEle = document.getElementById("token-error");
         if (errorEle) errorEle?.remove();
       }
@@ -146,6 +177,7 @@
   <body>
     <div id="app-root">
       <div id="main-container">
+        <incoming-call-component channel-name="incoming-call-channel" on-accepted="onAccepted"></incoming-call-component>
         <header>
           <h4>Dolphin<span class="highlight-blue">CX</span> Integration</h4>
           <p>This is the sample POC to integrate DCX components to static html using basic Javascript</p>
