@@ -44,7 +44,15 @@
 
         // Accessing phone number from input box
         const number = document.getElementsByName("number")[0].value;
-        invokeCallerComponent({ "call-invite-data": JSON.stringify({dvc: [], telephony: [number]}) });
+
+        // Accessing phone number from input box
+        const agent_email = document.getElementsByName("agent_email")[0].value;
+
+        const invitees = { dvc: [],  telephony: [] }
+        if (number) invitees.telephony = [number];
+        if (agent_email) invitees.dvc = [agent_email];
+
+        invokeCallerComponent({ "call-invite-data": JSON.stringify(invitees) });
       }
     </script>
 
@@ -93,8 +101,8 @@
       #app-root .field-container { margin-bottom: 10px; position: relative; }
       #app-root .field-container label { font-weight: 500; font-size: 16px; margin-right: 30px; display: inline-block; width: 100px;}
       #app-root .field-container input { width: 350px; padding: 10px; border-radius: 5px; border: unset; }
-      #app-root .field-container .refresh-btn { position: absolute; width: 18px; height: 18px; background-color: white; padding: 5px; border-radius: 50%; right: 30px; top: 2px; }
-      #app-root .field-container .copy-btn { position: absolute; width: 18px; height: 18px; background-color: white; padding: 5px; border-radius: 50%; right: 0px; top: 2px; }
+      #app-root .field-container .refresh-btn { position: absolute; width: 18px; height: 18px; background-color: white; padding: 5px; border-radius: 50%; right: 30px; top: 2px; cursor: pointer;}
+      #app-root .field-container .copy-btn { position: absolute; width: 18px; height: 18px; background-color: white; padding: 5px; border-radius: 50%; right: 0px; top: 2px; cursor: pointer;}
       #app-root button { color: white; background-color: dodgerblue; border-radius: 5px; padding: 10px 30px; cursor: pointer; border: unset; align-self: center; }
       #app-root #token-error { color: red }
     </style>
@@ -219,6 +227,13 @@
         })
         .then(res => res.json()).then(res => tokenInput.defaultValue = res.token);
       }
+
+      function handleClickCopy(e) {
+        // Accessing token from input box
+        const token = document.getElementsByName("token")[0].value;
+
+        navigator.clipboard.writeText(token);
+      }
     </script>
 
   </head>
@@ -252,11 +267,15 @@
               <label for="token">Token:</label>
               <input disabled id="token" type="text" name="token" />
               <svg onclick="handleClickRefreshToken(event)" class="refresh-btn" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="200px" width="200px" xmlns="http://www.w3.org/2000/svg"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path></svg>
-              <svg class="copy-btn" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M18 2H9c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h9c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H9V4h9v12zM3 15v-2h2v2H3zm0-5.5h2v2H3v-2zM10 20h2v2h-2v-2zm-7-1.5v-2h2v2H3zM5 22c-1.1 0-2-.9-2-2h2v2zm3.5 0h-2v-2h2v2zm5 0v-2h2c0 1.1-.9 2-2 2zM5 6v2H3c0-1.1.9-2 2-2z"></path></svg>
+              <svg onclick="handleClickCopy(event)" class="copy-btn" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M18 2H9c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h9c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H9V4h9v12zM3 15v-2h2v2H3zm0-5.5h2v2H3v-2zM10 20h2v2h-2v-2zm-7-1.5v-2h2v2H3zM5 22c-1.1 0-2-.9-2-2h2v2zm3.5 0h-2v-2h2v2zm5 0v-2h2c0 1.1-.9 2-2 2zM5 6v2H3c0-1.1.9-2 2-2z"></path></svg>
             </div>
             <button type="submit">Update</button>
           </form>
           <form onsubmit="handleCall(event)">
+            <div class="field-container">
+              <label for="agent_email">Agent Email:</label>
+              <input id="agent_email" type="text" name="agent_email" />
+            </div>
             <div class="field-container">
               <label for="number">Number:</label>
               <input id="number" type="text" name="number" />
