@@ -3,7 +3,7 @@
   <head>
     <!-- Need to fetch these bundle files to use DCX components. It has core logic to invoke the components -->
     <script src="https://pulsedolphincx.nexus.dolphincx.com/console/external_api.js"></script>
-    <script src="https://ephemeral-phoenix-0d916f.netlify.app/bundle.min.js"></script>
+    <script src="https://dcx-poc.netlify.app/bundle.min.js"></script>
 
 
 
@@ -17,6 +17,7 @@
         window?.xq?.getSdkUserDetails(token, undefined, onSuccess, onFailure);
       }
     </script>
+
 
 
     <!-- This script contains the logic to initiate xmpp connection -->
@@ -43,10 +44,10 @@
         e.preventDefault();
 
         // Accessing phone number from input box
-        const number = document.getElementsByName("number")[0].value;
+        const number = document.getElementById("number").value;
 
         // Accessing phone number from input box
-        const agent_email = document.getElementsByName("agent_email")[0].value;
+        const agent_email = document.getElementById("agent_email").value;
 
         const invitees = { dvc: [],  telephony: [] }
         if (number) invitees.telephony = [number];
@@ -82,7 +83,7 @@
         }
 
         // Appending caller compoennt to body using DOM API
-        document.getElementsByTagName("body")[0].appendChild(callerComponent);
+        document.body.appendChild(callerComponent);
       }
     </script>
 
@@ -172,10 +173,10 @@
         e.preventDefault();
 
         // Accessing token from input box
-        const token = document.getElementsByName("token")[0].value;
+        const token = document.getElementById("token").value;
 
         // Accesssing DCX server from input box
-        const server = document.getElementsByName("server")[0].value;
+        const server = document.getElementById("server").value;
 
         if (!token || !server) {
           alert("DCX-Server & Token are required!");
@@ -195,13 +196,13 @@
         localStorage.removeItem("X-DVC-Token");
 
         // Accessing name from input box
-        const name = document.getElementsByName("name")[0].value;
+        const name = document.getElementById("name").value;
 
         // Accessing email from input box
-        const email = document.getElementsByName("email")[0].value;
+        const email = document.getElementById("email").value;
 
         // Accesssing DCX server from input box
-        const server = document.getElementsByName("server")[0].value;
+        const server = document.getElementById("server").value;
 
         if (!name || !email || !server) {
           alert("Server & Name & Email are required!");
@@ -230,7 +231,7 @@
 
       function handleClickCopy(e) {
         // Accessing token from input box
-        const token = document.getElementsByName("token")[0].value;
+        const token = document.getElementById("token").value;
 
         navigator.clipboard.writeText(token);
       }
@@ -272,6 +273,7 @@
             <button type="submit">Update</button>
           </form>
           <form onsubmit="handleCall(event)">
+            <h5 class="panel-heading">Outgoing</h5>
             <div class="field-container">
               <label for="agent_email">Agent Email:</label>
               <input id="agent_email" type="text" name="agent_email" />
