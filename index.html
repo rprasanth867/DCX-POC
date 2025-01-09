@@ -10,7 +10,7 @@
     <!-- This script contains the logic to handshake for the DCX app -->
     <script>
       function initiateHandshake(server, token) {
-        const xq = new window.XQ(server);
+        const xq = new window.XQ(server, null, getToken);
 
         window.xq = xq;
         
@@ -105,6 +105,7 @@
       #app-root .field-container .refresh-btn { position: absolute; width: 18px; height: 18px; background-color: white; padding: 5px; border-radius: 50%; right: 30px; top: 2px; cursor: pointer;}
       #app-root .field-container .copy-btn { position: absolute; width: 18px; height: 18px; background-color: white; padding: 5px; border-radius: 50%; right: 0px; top: 2px; cursor: pointer;}
       #app-root button { color: white; background-color: dodgerblue; border-radius: 5px; padding: 10px 30px; cursor: pointer; border: unset; align-self: center; }
+      #app-root button:active { background-color: rgb(11, 107, 202); }
       #app-root #token-error { color: red }
     </style>
 
@@ -183,14 +184,10 @@
           return;
         }
 
-        // Storing server in the localStorage
-        localStorage.setItem("dcx-server", server);
-        localStorage.setItem("X-DVC-Token", token);
-
         initiateHandshake(server, token);
       }
 
-      function handleClickRefreshToken(e) {
+      async function getToken(e) {
         const tokenInput = document.getElementById('token'); 
         tokenInput.defaultValue = "-";
         localStorage.removeItem("X-DVC-Token");
@@ -209,9 +206,6 @@
           return;
         }
 
-        localStorage.setItem("name", name);
-        localStorage.setItem("email", email);
-
         const payload = {
           first_name: name,
           last_name: null,
@@ -219,14 +213,30 @@
           tenant_domain: server.replace(/(http)(s)?\:\/\//, "")
         }
 
-        fetch("https://dev.sample-server.nouveau-labs.in/api/v1/sdk/token", {
-          method: "POST",
-          body: JSON.stringify(payload),
-          headers: {
-              "content-type": "application/json"
-          }
-        })
-        .then(res => res.json()).then(res => tokenInput.defaultValue = res.token);
+        try {
+          const jsonRes = await fetch("https://dev.sample-server.nouveau-labs.in/api/v1/sdk/token", {
+            method: "POST",
+            body: JSON.stringify(payload),
+            headers: {
+                "content-type": "application/json"
+            }
+          })
+
+          const res = await jsonRes.json();
+
+          tokenInput.defaultValue = res.token;
+
+          // Storing these information in localStorage
+          localStorage.setItem("name", name);
+          localStorage.setItem("email", email);
+          localStorage.setItem("dcx-server", server);
+          localStorage.setItem("X-DVC-Token", res.token);
+
+          return res.token;
+        } catch (err) {
+          console.error("Failed to get token. ERROR:", err);
+          return;
+        }
       }
 
       function handleClickCopy(e) {
@@ -267,7 +277,7 @@
             <div id="token-field" class="field-container">
               <label for="token">Token:</label>
               <input disabled id="token" type="text" name="token" />
-              <svg onclick="handleClickRefreshToken(event)" class="refresh-btn" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="200px" width="200px" xmlns="http://www.w3.org/2000/svg"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path></svg>
+              <svg onclick="getToken(event)" class="refresh-btn" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="200px" width="200px" xmlns="http://www.w3.org/2000/svg"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path></svg>
               <svg onclick="handleClickCopy(event)" class="copy-btn" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M18 2H9c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h9c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H9V4h9v12zM3 15v-2h2v2H3zm0-5.5h2v2H3v-2zM10 20h2v2h-2v-2zm-7-1.5v-2h2v2H3zM5 22c-1.1 0-2-.9-2-2h2v2zm3.5 0h-2v-2h2v2zm5 0v-2h2c0 1.1-.9 2-2 2zM5 6v2H3c0-1.1.9-2 2-2z"></path></svg>
             </div>
             <button type="submit">Update</button>
