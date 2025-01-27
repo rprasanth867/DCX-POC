@@ -31,6 +31,7 @@
       }
 
       window.onAccepted = (d) => {
+        console.log('Meeting information:', d);
         invokeCallerComponent({"web-client-uri": d?.web_client_uri});
       };
     </script>
@@ -67,6 +68,11 @@
         callerComponent?.remove();
       }
 
+      window.onMeetingData = function({data, proceed}) {
+        console.log('Meeting information:', data);
+        proceed();
+      }
+
       function invokeCallerComponent(attributes) {
         // Creating caller component using DOM APIs
         const callerComponent = document.createElement("caller-component");
@@ -76,8 +82,9 @@
         callerComponent.setAttribute("call-type", "AUDIO");
         callerComponent.setAttribute("draggable", "true");
         callerComponent.setAttribute("on-call-ended", "onCallEnded");
+        callerComponent.setAttribute("on-meeting-data", "onMeetingData");
 
-        // Attaching extra attributes 
+        // Attaching extra attributes
         for (const [key, value] of Object.entries(attributes)) {
           callerComponent.setAttribute(key, value);
         }
