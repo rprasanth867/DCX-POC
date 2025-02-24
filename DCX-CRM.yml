@@ -1,0 +1,874 @@
+openapi: 3.0.1
+info:
+  title: DCX-CRM Provider
+  description: This gives sample idea on the APIs which are used for CRM and Ticketing system.
+  version: 1.0.0
+
+
+
+
+
+components:
+  schemas:
+    CustomerInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: UUID
+          example: 550e8400-e29b-41d4-a716-446655440000
+        customer_name:
+          type: string
+          example: "Mark Anthony"
+        created_at:
+          type: integer
+          format: timestamp
+          example: 1739875165
+        updated_at:
+          type: integer
+          format: timestamp
+          example: 1739875165
+        modified_by:
+          type: string
+          example: "ravindramca2006@gmail.com"
+        customer_type:
+          type: string
+          example: "Individual"
+        mobile_no:
+          type: string
+          example: "+918688663376"
+        comments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Comment"
+    Field:
+      type: object
+      properties:
+        fieldname:
+          type: string
+          example: name
+        label:
+          type: string
+          example: Customer Name
+        reqd:
+          type: boolean
+          description: Whether this field is required or not
+          example: false
+        fieldtype:
+          type: string
+          enum: [Data, Link, Long Text, Text Editor, Check, Date, Datetime, Duration, Select, Time, Section Break, Column Break]
+          example: Data
+        options:
+          type: array
+          items:
+            type: string
+        unique:
+          type: boolean
+          example: false
+        collapsible:
+          type: boolean
+          example: false
+    TicketInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: UUID
+          example: 550e8400-e29b-41d4-a716-446655440000
+        owner:
+          type: string
+          example: "Administrator"
+        creation:
+          type: integer
+          format: timestamp
+          example: 1739949328
+        modified:
+          type: integer
+          format: timestamp
+          example: 1739949328
+        modified_by:
+          type: string
+          example: "rt@nouveau-labs.com"
+        subject:
+          type: string
+          example: "Welcome to Helpdesk"
+        raised_by:
+          type: string
+          example: "sabu@example.com"
+        status:
+          type: string
+          example: "Open"
+        priority:
+          type: string
+          example: "Medium"
+        ticket_type:
+          type: string
+          example: "Unspecified"
+        description:
+          type: string
+          format: html
+          example: "Hi 👋<br><br>I'm glad you decided to try Helpdesk!..."
+        response_by:
+          type: integer
+          format: timestamp
+          example: 1739949328
+        agreement_status:
+          type: string
+          example: "Resolution Due"
+        resolution_by:
+          type: integer
+          format: timestamp
+          example: 1739949328
+        total_hold_time:
+          type: number
+          format: float
+          example: 2336.68883
+        first_responded_on:
+          type: integer
+          format: timestamp
+          example: 1739949328
+        opening_datetime:
+          type: integer
+          format: timestamp
+          example: 1739949328
+        contact:
+          type: string
+          example: "Sabu Siyad"
+        customer_email:
+          type: string
+          example: "markanthony@gmail.com"
+        customer_name:
+          type: string
+          example: "Mark Anthony"
+        via_customer_portal:
+          type: boolean
+          example: true
+        feedback_submitted:
+          type: boolean
+          example: true
+        feedback_status:
+          type: string
+          example: ""
+        dashboard_uri:
+          type: string
+          format: uri
+          example: "https://dev.frappe.dvc.nouveau-labs.in/helpdesk/tickets/1"
+        comments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Comment"
+    Comment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: UUID
+          example: 550e8400-e29b-41d4-a716-446655440000
+        content:
+          type: string
+          example: "I added a comment"
+        comment_by:
+          type: string
+          example: "Agent1"
+        comment_email:
+          type: string
+          example: agent1@gmail.com
+        created_at:
+          type: integer
+          format: timestamp
+          example: 1739949328
+
+
+
+  responses:
+    delete_success:
+      description: Delete success response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 200
+              message:
+                type: string
+                example: Deleted successfully
+    failure_response:
+      description: Responses expect 200 and 401
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 400
+              message:
+                type: string
+                example: Invalid inputs
+    unauthorized_response:
+      description: User is unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            format: application/json
+            properties:
+              code:
+                type: integer
+                example: 401
+              message:
+                type: string
+                example: User is unauthorized
+
+
+
+tags:
+  - name: CRM
+    description: CRM APIs
+  - name: Ticketing System
+    description: Ticketing System APIs
+  - name: Common
+    description: These APIs are common for CRM & Ticketing System
+
+
+
+paths:
+  /customers:
+    get:
+      tags:
+        - "CRM"
+      summary: Returns a list of customers.
+      description: It should take some parameters as filters and should return customers according to the parameters.
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            example: 5
+          required: true
+        - name: page
+          in: query
+          schema:
+            type: integer
+            example: 1
+          required: true
+        - name: id
+          in: query
+          schema:
+            type: string
+            format: UUID
+            example: 550e8400-e29b-41d4-a716-446655440000
+        - name: name
+          in: query
+          schema:
+            type: string
+            example: Mark Anthony
+        - name: email
+          in: query
+          schema:
+            type: string
+            example: markanthony@gmail.com
+        - name: mobile_no
+          in: query
+          schema:
+            type: string
+            example: "+919999999999"
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            example: desc
+            default: desc
+        - name: order_by
+          in: query
+          schema:
+            type: string
+            enum: [name, date]
+            example: date
+            default: date
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_count:
+                    type: number
+                    description: Total number of rows are present with these filters expect limit and page
+                    example: 15
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: UUID
+                          example: 550e8400-e29b-41d4-a716-446655440000
+                        name:
+                          type: string
+                          example: Mark Anthony
+                        type:
+                          type: string
+                          example: individual
+                        email:
+                          type: string
+                          example: markanthony@gmail.com
+                        mobile_no:
+                          type: string
+                          example: "+919999999999"
+                        address:
+                          type: string
+                          example: address
+                        date_of_created:
+                          type: integer
+                          format: timestamp
+                          example: 1739857208
+        "400":
+          $ref: "#/components/responses/failure_response"
+        "401":
+          $ref: "#/components/responses/unauthorized_response"
+  
+  
+  /customer/form-template:
+    get:
+      tags:
+        - "CRM"
+      summary: Returns the fields which are displayed in the UI
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Field"
+        "400":
+          $ref: "#/components/responses/failure_response"
+        "401":
+          $ref: "#/components/responses/unauthorized_response"
+  
+  
+  /customers/{id}:
+    get:
+      tags:
+        - "CRM"
+      summary: Returns customer detail information
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: UUID
+            example: 550e8400-e29b-41d4-a716-446655440000
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/CustomerInfo"
+        "400":
+          $ref: "#/components/responses/failure_response"
+        "401":
+          $ref: "#/components/responses/unauthorized_response"
+
+    patch:
+      tags:
+        - "CRM"
+      summary: Updates customer information & returns latest customer information with all fields
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: UUID
+            example: 550e8400-e29b-41d4-a716-446655440000
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomerInfo"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/CustomerInfo"
+        "400":
+          $ref: "#/components/responses/failure_response"
+        "401":
+          $ref: "#/components/responses/unauthorized_response"
+    
+    delete:
+      tags:
+        - "CRM"
+      summary: Deletes the customer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: UUID
+            example: 550e8400-e29b-41d4-a716-446655440000
+      responses:
+        "200":
+         $ref: "#/components/responses/delete_success"
+        "400":
+          $ref: "#/components/responses/failure_response"
+        "401":
+          $ref: "#/components/responses/unauthorized_response"
+
+
+  /customer/create:
+    post:
+      tags:
+        - "CRM"
+      summary: Create a customer and returns customer information with all fields
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customer_name:
+                  type: string
+                  example: "Mark Anthony"
+                modified_by:
+                  type: string
+                  example: "ravindramca2006@gmail.com"
+                customer_type:
+                  type: string
+                  example: "Individual"
+                mobile_no:
+                  type: string
+                  example: "+918688663376"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/CustomerInfo"
+        "400":
+          $ref: "#/components/responses/failure_response"
+        "401":
+          $ref: "#/components/responses/unauthorized_response"
+          
+  
+  /customers/{id}/add-comment:
+    post:
+      tags:
+        - "CRM"
+      summary: To add a comment to the customer and returns it
+      parameters:
+        - name: id
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: string
+            format: UUID
+            example: 550e8400-e29b-41d4-a716-446655440000
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                content:
+                  type: string
+                  example: "I added a comment"
+                comment_by:
+                  type: string
+                  example: "Agent1"
+                comment_email:
+                  type: string
+                  example: agent1@gmail.com
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Comment"
+        "400":
+          $ref: "#/components/responses/failure_response"
+        "401":
+          $ref: "#/components/responses/unauthorized_response"
+  
+
+  /tickets:
+    get:
+      tags:
+        - "Ticketing System"
+      summary: Returns a list of tickets.
+      description: It should take some parameters as filters and should return tickets according to the parameters.
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            example: 5
+          required: true
+        - name: page
+          in: query
+          schema:
+            type: integer
+            example: 1
+          required: true
+        - name: id
+          in: query
+          schema:
+            type: string
+            format: UUID
+            example: 550e8400-e29b-41d4-a716-446655440000
+        - name: subject
+          in: query
+          schema:
+            type: string
+            example: Amount debited
+        - name: customer_name
+          in: query
+          schema:
+            type: string
+            example: Mark Anthony
+        - name: status
+          in: query
+          schema:
+            type: string
+            example: open
+            enum: [open, replied, resolved, closed]
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            example: desc
+            default: desc
+        - name: order_by
+          in: query
+          schema:
+            type: string
+            enum: [subject, date]
+            example: date
+            default: date
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_count:
+                    type: integer
+                    example: 8
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: UUID
+                          example: 550e8400-e29b-41d4-a716-446655440000
+                        subject:
+                          type: string
+                          example: "Welcome to Helpdesk"
+                        status:
+                          type: string
+                          example: "Open"
+                        raised_by:
+                          type: string
+                          example: "sabu@example.com"
+                        priority:
+                          type: string
+                          example: "Medium"
+                        owner:
+                          type: string
+                          example: "Administrator"
+                        opening_date:
+                          type: integer
+                          format: timestamp
+                          example: 1739949328
+                        customer_email:
+                          type: string
+                          example: "markanthony@gmail.com"
+                        customer_name:
+                          type: string
+                          example: "Mark Anthony"
+        "400":
+          $ref: "#/components/responses/failure_response"
+        "401":
+          $ref: "#/components/responses/unauthorized_response"
+    
+
+  /ticket/form-template:
+    get:
+      tags:
+        - "Ticketing System"
+      summary: Returns the fields which are displayed in the UI
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Field"
+                       
+        "400":
+          $ref: "#/components/responses/failure_response"
+        "401":
+          $ref: "#/components/responses/unauthorized_response"
+  
+  
+  /tickets/{id}:
+    get:
+      tags:
+        - "Ticketing System"
+      summary: Returns ticket detail information
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+            format: UUID
+            example: 550e8400-e29b-41d4-a716-446655440000
+          required: true
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/TicketInfo"
+        "400":
+          $ref: "#/components/responses/failure_response"
+        "401":
+          $ref: "#/components/responses/unauthorized_response"
+    
+    patch:
+      tags:
+        - "Ticketing System"
+      summary: Updates ticket information & returns latest ticket information with all fields
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+            format: UUID
+            example: 550e8400-e29b-41d4-a716-446655440000
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TicketInfo"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/TicketInfo"
+        "400":
+          $ref: "#/components/responses/failure_response"
+        "401":
+          $ref: "#/components/responses/unauthorized_response"
+
+    delete:
+      tags:
+        - "Ticketing System"
+      summary: Deletes the ticket
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: UUID
+            example: 550e8400-e29b-41d4-a716-446655440000
+      responses:
+        "200":
+         $ref: "#/components/responses/delete_success"
+        "400":
+          $ref: "#/components/responses/failure_response"
+        "401":
+          $ref: "#/components/responses/unauthorized_response"
+  
+  
+  /ticket/create:
+    post:
+      tags:
+        - "Ticketing System"
+      summary: Create a ticket and returns ticket information with all fields
+      requestBody:
+        required: true
+        description: Some fields (id, creation, modified, etc..) will not be contain in the body
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TicketInfo"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/TicketInfo"
+        "400":
+          $ref: "#/components/responses/failure_response"
+        "401":
+          $ref: "#/components/responses/unauthorized_response"
+
+
+  /tickets/{id}/add-comment:
+    post:
+      tags:
+        - "Ticketing System"
+      summary: To add a comment to the ticket and returns it
+      parameters:
+        - name: id
+          in: path
+          description: Ticket ID
+          required: true
+          schema:
+            type: string
+            format: UUID
+            example: 550e8400-e29b-41d4-a716-446655440000
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                content:
+                  type: string
+                  example: "I added a comment"
+                comment_by:
+                  type: string
+                  example: "Agent1"
+                comment_email:
+                  type: string
+                  example: agent1@gmail.com
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Comment"
+        "400":
+          $ref: "#/components/responses/failure_response"
+        "401":
+          $ref: "#/components/responses/unauthorized_response"
+    
+  
+  /update-comment/{comment_id}:
+    patch:
+      tags:
+        - "Common"
+      summary: To update a comment and returns it
+      parameters:
+        - name: comment_id
+          in: path
+          description: Comment ID
+          required: true
+          schema:
+            type: string
+            format: UUID
+            example: 550e8400-e29b-41d4-a716-446655440000
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                content:
+                  type: string
+                  example: "I updated a comment"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Comment"
+        "400":
+          $ref: "#/components/responses/failure_response"
+        "401":
+          $ref: "#/components/responses/unauthorized_response"
+
+  
+  /delete-comment/{comment_id}:
+    delete:
+      tags:
+        - "Common"
+      summary: To delete a comment
+      parameters:
+        - name: comment_id
+          in: path
+          description: Comment ID
+          required: true
+          schema:
+            type: string
+            format: UUID
+            example: 550e8400-e29b-41d4-a716-446655440000
+      responses:
+        "200":
+          $ref: "#/components/responses/delete_success"
+        "400":
+          $ref: "#/components/responses/failure_response"
+        "401":
+          $ref: "#/components/responses/unauthorized_response"
+
+
