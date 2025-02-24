@@ -82,6 +82,8 @@ sequenceDiagram
     autonumber
     actor Odoo-User
     participant DCX-Meeting
+    participant Prosody
+    participant Odoo-Server
 
     alt When Odoo-User makes a call
         rect rgb(250, 247, 237)
@@ -92,12 +94,13 @@ sequenceDiagram
             Odoo-User->>DCX-Meeting: <br/> /call (POST) {"meeting_info_id": "a12", "users": {}}
             DCX-Meeting-->>Odoo-User: Res 200 {"failures": {}}
     
-            Odoo-User-)Prosody: <br/> Odoo-User joins to the call<br />(Meeting websocket connection will be estalished)
+            Odoo-User-)Prosody: <br/> Odoo-User joins to the call<br />(Meeting websocket connection or http-bind requests will be estalished)
             Prosody--)Odoo-User: Prosody sends an event when call ends
             Note right of Odoo-User: Odoo-User can subscribe to this event using on-call-ended method
-    
-            DCX-Meeting--)Odoo-User: <br/> Meeting service will send complete meeting information using webhooks (Async action)
-            Note over Odoo-User, DCX-Meeting: Above data will contain<br />(meeting_id, meeting_info_id, start_time, end_time, caller, callee, direction, status, ...)
+
+            DCX-Meeting--)Odoo-Server: <br/> Meeting service will send complete meeting information using webhooks (Async action)
+            Note over DCX-Meeting, Odoo-Server: Above data will contain<br />(meeting_id, meeting_info_id, start_time, end_time, caller, callee, direction, status, ...)
+            DCX-Meeting--)Odoo-Server: <br/> Meeting service will send transcriptions and recordings using webhooks (Async action)
         end
     else When Odoo-User recieves a call
         rect rgb(233, 240, 235)
@@ -109,13 +112,16 @@ sequenceDiagram
             DCX-Meeting-->>Odoo-User: Res 200 {"meeting_id": "123", "meeting_info_id": "a12", ...}
             Note over Odoo-User, DCX-Meeting: Odoo-User can get these above details using on-accepted method
 
-            Odoo-User-)Prosody: <br/> Odoo-User joins to the call<br />(Meeting websocket connection will be estalished)
+            Odoo-User-)Prosody: <br/> Odoo-User joins to the call<br />(Meeting websocket connection or http-bind requests will be estalished)
             Prosody--)Odoo-User: Prosody sends an event when call ends
             Note right of Odoo-User: Odoo-User can subscribe to this event using on-call-ended method
-            DCX-Meeting--)Odoo-User: <br/> Meeting service will send complete meeting information using webhooks (Async action)
-            Note over Odoo-User, DCX-Meeting: Above data will contain<br />(meeting_id, meeting_info_id, start_time, end_time, caller, callee, direction, status, ...)
+
+            DCX-Meeting--)Odoo-Server: <br/> Meeting service will send complete meeting information using webhooks (Async action)
+            Note over DCX-Meeting, Odoo-Server: Above data will contain<br />(meeting_id, meeting_info_id, start_time, end_time, caller, callee, direction, status, ...)
+            DCX-Meeting--)Odoo-Server: <br/> Meeting service will send transcriptions and recordings using webhooks (Async action)
         end
     end
+
 
 
 
