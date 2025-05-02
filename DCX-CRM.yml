@@ -62,6 +62,10 @@ components:
           type: array
           items:
             type: string
+        search:
+          type: boolean
+          description: It will be applicable if fieldtype is Select. It will enable to search the options
+          example: false
         unique:
           type: boolean
           example: false
