@@ -32,7 +32,8 @@
 
       window.onAccepted = (d) => {
         console.log('Meeting information:', d);
-        invokeCallerComponent({"web-client-uri": d?.web_client_uri});
+        // Passing sample meta data for future actions if needed
+        invokeCallerComponent({"web-client-uri": d?.web_client_uri, meta: JSON.stringify({key1: "value1", key2: "value2"})});
       };
     </script>
 
@@ -54,7 +55,8 @@
         if (number) invitees.telephony = [number];
         if (agent_email) invitees.dvc = [agent_email];
 
-        invokeCallerComponent({ "call-invite-data": JSON.stringify(invitees) });
+        // Passing sample meta data for future actions if needed
+        invokeCallerComponent({ "call-invite-data": JSON.stringify(invitees), meta: JSON.stringify({key1: "value1", key2: "value2"}) });
       }
     </script>
 
@@ -69,7 +71,10 @@
       }
 
       window.onMeetingData = function({data, proceed}) {
+        const callerComponent = document.getElementsByTagName("caller-component")?.[0];
+        const meta = JSON.parse(callerComponent?.getAttribute("meta"));
         console.log('Meeting information:', data);
+        console.log("Meta data of caller-component. meta:", meta);
         proceed();
       }
 
