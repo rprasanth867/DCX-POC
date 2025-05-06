@@ -6,11 +6,14 @@
     <script src="https://dcx-poc.netlify.app/bundle.min.js"></script>
 
 
-
     <!-- This script contains the logic to handshake for the DCX app -->
     <script>
       function initiateHandshake(server, token) {
-        const xq = new window.XQ(server, null, getToken);
+        const host_app = {
+          third_party_integration: true,
+          host_app: "poc"
+        }
+        const xq = new window.XQ(server, null, host_app, getToken);
 
         window.xq = xq;
         
