@@ -102,6 +102,55 @@
       }
     </script>
 
+    <!-- This script contains the logic to invoke Advanced Dialer component -->
+    <script>
+      function handleClickAdvanceDialer(e) {
+        // Opening modal
+        const modal = document.getElementById("modal-container");
+        modal.style.display = "flex";
+
+        // Invoking advanced dailer component
+        invokeAdvancedDialerComponent({});
+      }
+
+      window.onInitiateCall = function (e) {
+        if (!e?.data?.dvc?.length && !e?.data?.telephony?.length && !e?.data?.groups?.length) {
+          console.error("Failed to get participant data from Advanced Dialer Component", e);
+          return;
+        }
+
+        invokeCallerComponent({"call-invite-data": JSON.stringify(e.data)});
+        window.onCloseClick();
+      }
+
+      window.onCloseClick = function() {
+        // Closing modal
+        const modal = document.getElementById("modal-container");
+        modal.style.display = "none";
+
+        // Removing advanced dialer component from DOM
+        const advancedDialerComponent = document.getElementsByTagName("advanced-dialer-component")[0];
+        advancedDialerComponent?.remove();
+      }
+
+      function invokeAdvancedDialerComponent(attributes) {
+        // Creating advanced dialer component using DOM APIs
+        const advancedDialerComponent = document.createElement("advanced-dialer-component");
+        // Attaching common attributes
+        advancedDialerComponent.setAttribute("current-user-id", JSON.parse(localStorage.getItem("X-DVC-Details") || "{}").uuid);
+        advancedDialerComponent.setAttribute("on-initiate-call", "onInitiateCall");
+        advancedDialerComponent.setAttribute("on-close-click", "onCloseClick");
+
+        // Attaching extra attributes
+        for (const [key, value] of Object.entries(attributes)) {
+          advancedDialerComponent.setAttribute(key, value);
+        }
+
+        // Appending advanced dialer component to advance-dialer-container div element using DOM API
+        document.getElementById("advance-dialer-container").appendChild(advancedDialerComponent);
+      }
+    </script>
+
 
 
     <!-- This style contains CSS for this sample app -->
@@ -299,6 +348,11 @@
           </form>
           <form onsubmit="handleCall(event)">
             <h5 class="panel-heading">Outgoing</h5>
+            <div style="display: flex; align-items: center;">
+              <p style="width: 50%">Open Advanced Dialer</p>
+              <button type="button" onclick="handleClickAdvanceDialer(event)">Advanced Dailer</button>
+            </div>
+            <p style="text-align: center; ">(Or)</p>
             <div class="field-container">
               <label for="agent_email">Agent Email:</label>
               <input id="agent_email" type="text" name="agent_email" />
@@ -310,6 +364,11 @@
             <button type="submit">Call</button>
           </form>
         </div>
+      </div>
+    </div>
+    <div id="modal-container" style="display: none; background-color: rgba(0, 0, 0, 0.4); backdrop-filter: blur(2px); position: absolute; top:0; left:0; height: 100vh; width: 100vw; align-items: center; justify-content: center; z-index: 1;">
+      <div style="width: 400px; height: 500px; padding: 20px 20px 0px; border-radius: 20px; background-color: white;">
+        <div id="advance-dialer-container" style="height: 100%;"></div>
       </div>
     </div>
     <pre style="display: none;">
