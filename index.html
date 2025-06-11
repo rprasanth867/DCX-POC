@@ -274,7 +274,8 @@
           first_name: name,
           last_name: null,
           username: email,
-          tenant_domain: server.replace(/(http)(s)?\:\/\//, "")
+          tenant_domain: server.replace(/(http)(s)?\:\/\//, ""),
+          role: "tenant_agent"
         }
 
         try {
