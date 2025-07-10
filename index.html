@@ -207,6 +207,7 @@
         const server = localStorage.getItem("dcx-server");
         const name = localStorage.getItem("name");
         const email = localStorage.getItem("email");
+        const mobile = localStorage.getItem("mobile");
 
         const tokenInput = document.getElementById('token');
 
@@ -225,6 +226,11 @@
         if (email) {
           const emailInput = document.getElementById('email');
           emailInput.defaultValue = email;
+        }
+
+        if (mobile) {
+          const mobileInput = document.getElementById('mobile');
+          mobileInput.defaultValue = mobile;
         }
 
         if (token && server) {
@@ -265,6 +271,9 @@
         // Accessing email from input box
         const email = document.getElementById("email").value;
 
+        // Accessing mobile from input box
+        const mobile = document.getElementById("mobile").value;
+
         // Accesssing DCX server from input box
         const server = document.getElementById("server").value;
 
@@ -280,6 +289,8 @@
           tenant_domain: server.replace(/(http)(s)?\:\/\//, ""),
           role: "tenant_agent"
         }
+
+        if (mobile) payload.mobile_no = mobile;
 
         try {
           const jsonRes = await fetch("https://dev.sample-server.nouveau-labs.in/api/v1/sdk/token", {
@@ -297,6 +308,7 @@
           // Storing these information in localStorage
           localStorage.setItem("name", name);
           localStorage.setItem("email", email);
+          localStorage.setItem("mobile", mobile);
           localStorage.setItem("dcx-server", server);
           localStorage.setItem("X-DVC-Token", res.token);
 
@@ -341,6 +353,10 @@
             <div id="email-field" class="field-container">
               <label for="email">Email:</label>
               <input id="email" type="text" name="email" />
+            </div>
+            <div id="mobile-field" class="field-container">
+              <label for="mobile">Mobile:</label>
+              <input id="mobile" type="text" name="mobile" />
             </div>
             <div id="token-field" class="field-container">
               <label for="token">Token:</label>
