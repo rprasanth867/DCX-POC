@@ -2,10 +2,10 @@
 <html>
   <head>
     <!-- Need to fetch these bundle files to use DCX components. It has core logic to invoke the components -->
-    <script src="https://callease.dolphincx.nouveau-labs.in/console/external_api.js"></script>
-    <script src="https://dcx-poc.netlify.app/bundle.min.js"></script>
+    <script src="https://dialora.preprod.nouveau-labs.in/console/external_api.js"></script>
+    <!-- <script src="https://dcx-poc.netlify.app/bundle.min.js"></script> -->
     <!-- <script src="http://localhost:3000/static/js/bundle.js"></script> -->
-    <!-- <script src="./bundle.min.js"></script> -->
+    <script src="./bundle.min.js"></script>
 
 
     <!-- This script contains the logic to handshake for the DCX app -->
@@ -38,7 +38,7 @@
       window.onAccepted = (d) => {
         console.log('Meeting information:', d);
         // Passing sample meta data for future actions if needed
-        invokeCallerComponent({"web-client-uri": d?.web_client_uri, meta: JSON.stringify({key1: "value1", key2: "value2"})});
+        invokeCallerComponent({"web-client-uri": d?.web_client_uri, "call-type": d?.callMode?.toUpperCase(), meta: JSON.stringify({key1: "value1", key2: "value2"})});
       };
     </script>
 
@@ -61,7 +61,7 @@
         if (agent_email) invitees.dvc = [agent_email];
 
         // Passing sample meta data for future actions if needed
-        invokeCallerComponent({ "call-invite-data": JSON.stringify(invitees), meta: JSON.stringify({key1: "value1", key2: "value2"}) });
+        invokeCallerComponent({ "call-invite-data": JSON.stringify(invitees), "call-type": "AUDIO", meta: JSON.stringify({key1: "value1", key2: "value2"}) });
       }
     </script>
 
@@ -89,7 +89,6 @@
         // Attaching common attributes
         callerComponent.setAttribute("style", "display: contents;");
         callerComponent.setAttribute("current-user-id", JSON.parse(localStorage.getItem("X-DVC-Details") || "{}").uuid);
-        callerComponent.setAttribute("call-type", "AUDIO");
         callerComponent.setAttribute("draggable", "true");
         // callerComponent.setAttribute("on-call-ended", "onCallEnded");
         callerComponent.setAttribute("auto-destroy", "true");
@@ -122,7 +121,7 @@
           return;
         }
 
-        invokeCallerComponent({"call-invite-data": JSON.stringify(e.data)});
+        invokeCallerComponent({"call-invite-data": JSON.stringify(e.data), "call-type": e.type});
         window.onCloseClick();
       }
 
