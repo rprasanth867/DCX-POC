@@ -88,7 +88,6 @@
         const callerComponent = document.createElement("caller-component");
         // Attaching common attributes
         callerComponent.setAttribute("style", "display: contents;");
-        callerComponent.setAttribute("current-user-id", JSON.parse(localStorage.getItem("X-DVC-Details") || "{}").uuid);
         callerComponent.setAttribute("draggable", "true");
         // callerComponent.setAttribute("on-call-ended", "onCallEnded");
         callerComponent.setAttribute("auto-destroy", "true");
@@ -139,7 +138,6 @@
         // Creating advanced dialer component using DOM APIs
         const advancedDialerComponent = document.createElement("advanced-dialer-component");
         // Attaching common attributes
-        advancedDialerComponent.setAttribute("current-user-id", JSON.parse(localStorage.getItem("X-DVC-Details") || "{}").uuid);
         advancedDialerComponent.setAttribute("on-initiate-call", "onInitiateCall");
         advancedDialerComponent.setAttribute("on-close-click", "onCloseClick");
 
@@ -202,7 +200,7 @@
     <!-- When page loads if token & server are present in localStorage, invoking handshake with this token -->
     <script>
       document.addEventListener("DOMContentLoaded", () => {
-        const token = localStorage.getItem("X-DVC-Token");
+        const token = localStorage.getItem("token");
         const server = localStorage.getItem("dcx-server");
         const name = localStorage.getItem("name");
         const email = localStorage.getItem("email");
@@ -262,7 +260,7 @@
       async function getToken(e) {
         const tokenInput = document.getElementById('token'); 
         tokenInput.defaultValue = "-";
-        localStorage.removeItem("X-DVC-Token");
+        localStorage.removeItem("token");
 
         // Accessing name from input box
         const name = document.getElementById("name").value;
@@ -309,7 +307,7 @@
           localStorage.setItem("email", email);
           localStorage.setItem("mobile", mobile);
           localStorage.setItem("dcx-server", server);
-          localStorage.setItem("X-DVC-Token", res.token);
+          localStorage.setItem("token", res.token);
 
           return res.token;
         } catch (err) {
